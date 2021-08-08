@@ -13,7 +13,7 @@ import csv
 # from line_profiler import LineProfiler
 
 # profile = LineProfiler()
-from main import readimage, bainryToBlock, block_to_binary, block_to_decimal, writeimage, write_image
+from main import readimage, bainryToBlock, block_to_binary, block_to_decimal, write_image
 
 img, size = readimage('C:\\Users\\AURES\Downloads\\218715180_1699607756878227_1182138034353084512_n(1).jpg')
 print(size)

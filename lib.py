@@ -11,10 +11,10 @@ def gen_p(range_start, range_stop):
     return sympy.randprime(range_start, range_stop)
 
 
-def gen_q(range_start, range_stop, p):
+def gen_q(range_start, p):
+    print(range_start,p)
     while True:
         q = sympy.randprime(range_start, p)
-        print(q)
         if q < p:
             break
 
@@ -25,7 +25,8 @@ def gen_n(p, q):
     return p * q
 
 
-def gen_r(q, prime_range_start, prime_range_stop):
+def gen_r(q,prime_range_start, prime_range_stop):
+
     while True:
         secrets_gen = secrets.SystemRandom()
         r = secrets_gen.randrange(prime_range_start, prime_range_stop)
@@ -62,8 +63,11 @@ def fragment_msg(m: int):
     return {'m1': m1, 'm2': m2}
 
 
-def encrypt(block: [], public_key: int, n: int):
-    return (block[0] + public_key * block[1]) % n
+def encrypt(m: int, public_key: int, n: int):
+    parts = fragment_msg(m)
+    m1 = parts['m1']
+    m2 = parts['m2']
+    return (m1 + public_key * m2) % n
 
 
 def decrypt(c, private_key, p):
