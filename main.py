@@ -1,82 +1,43 @@
+import secrets
+
+import PIL
+import sympy
 import numpy
-from PIL import Image
+import helper_method_enc
+from helper_method_image import bainryToBlock, read_image, to_binary, block_to_binary, write_image
+import time
 
-from numpy import array
+start = time.time()
+block_size = 16
 
+img = read_image('8888.PNG', block_size)
+blocks = bainryToBlock(img, block_size)
+PRIME_RANGE_STOP = 999_999_999_9
+PRIME_RANGE_START = 100_000_000_0
 
-def readimage(path):
-    fin = Image.open(path)
-    # converting image into byte array to perform decryption easily on numeric data
-    image = array(fin)
-    #   PIL.Image.fromarray(image, "RGB").show()
+p = helper_method_enc.generate_p(PRIME_RANGE_START, PRIME_RANGE_STOP)
+q = helper_method_enc.generate_q(PRIME_RANGE_START, p)
+n = helper_method_enc.generate_n(p, q)
+r = helper_method_enc.gen_r(p, q, PRIME_RANGE_STOP)
+k = secrets.SystemRandom().randrange(50000, 80000)  # K>m
 
-    image_bits = []
-    for col in image:
-        col_s = ''
-        for pix in col:
-            pix_s = ''
-            for rgb in pix:
-                rgb_s = bin(rgb)[2:]
-                if (len(rgb_s) < 8):
-                    zeroo_number = 8 - len(rgb_s)
-                    rgb_s = '0' * zeroo_number + rgb_s
-                pix_s += rgb_s
-            col_s += pix_s
-        image_bits.append(col_s)
+privateKey = k
+publicKey = k + r * p
 
-    return image_bits, fin.size
-    # performing XOR operation on each value of bytearray
+enc_m = [helper_method_enc.encrypt(c, publicKey, n) for c in blocks]
 
+size_enc = len(to_binary(enc_m))
+print(f"enc m size {size_enc} bit")
+chars = [helper_method_enc.decrypt(c, privateKey, p) for c in enc_m]
+block_bin = block_to_binary(chars, block_size)
+print(f"enc  size / img size = {size_enc / len(block_bin)} ")
 
-def write_image(array_image):
-    image = []
-    for col_s in array_image:
-        pix = []
-        for i_pix in range(int(int(len(col_s)) / 24)):
-            pix_s = col_s[i_pix * 24:i_pix * 24 + 24]
-            rgb = []
-            for i_rgbs in range(3):
-                rgb.append(int(pix_s[i_rgbs * 8:i_rgbs * 8 + 8], 2))
-            pix.append(rgb)
-        image.append(pix)
-    return numpy.asarray(image)
+array_img = write_image(block_bin, block_size)
 
-
-def bainryToBlock(array_binary: [], len_m1):
-    blocks = []
-    for pixel in array_binary:
-        blocks.append([int(pixel[0:len_m1], 2), int(pixel[len_m1:], 2)])
-    return blocks
-
-
-def block_to_decimal(block_decimal: [], len_m1, size):
-    binaries = []
-    for pixel in block_decimal:
-        binary = bin(pixel)[2:]
-        div = size - len(binary)
-        if div>0:
-            binary = '0' * div + binary
-        binaries.append([int(binary[0:len_m1], 2), int(binary[len_m1:], 2)])
-    return binaries
-
-
-def block_to_binary(blocks: [], len_m1, len_m2):
-    blocks_St = []
-    for block in blocks:
-        m1 = bin(block[0])[2:]
-        m2 = bin(block[1])[2:]
-        if len(m1) < len_m1:
-            m1 = '0' * (len_m1 - len(m1)) + m1
-        div_m2 = len_m2 - len(m2)
-        if div_m2 > 0:
-            m2 = '0' * div_m2 + m2
-        blocks_St.append(m1 + m2)
-    return blocks_St
-print(int('1'*1000,2))
-# bainary = block_to_bainary(blocks,400,20232-400)
-# img2 = writeimage(bainary)
-
-# imge_out = Image.fromarray(img2.astype('uint8'))
-# img_as_img = imge_out.convert("RGB")
-
-# img_as_img.show()
+done = time.time()
+elapsed = done - start
+print(f"execution  time = {elapsed}  s")
+image_out = PIL.Image.fromarray(numpy.asarray(array_img).astype('uint8'))
+img_as_img = image_out.convert("RGB")
+print(img_as_img.size)
+img_as_img.show()
