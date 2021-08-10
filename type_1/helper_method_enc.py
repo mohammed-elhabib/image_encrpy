@@ -20,9 +20,9 @@ def generate_n(p, q):
 
 
 def gen_r(q,prime_range_start, prime_range_stop):
+    secrets_gen = secrets.SystemRandom()
 
     while True:
-        secrets_gen = secrets.SystemRandom()
         r = secrets_gen.randrange(prime_range_start, prime_range_stop)
 
         if r > q:
@@ -33,10 +33,10 @@ def fragment(m: int):
     size_of_int_m = len(str(m))
     if size_of_int_m == 1:
         return {'part_1': 0, 'part_2': m}
-    exp = 1
-    if size_of_int_m > 2:
-        rn = secrets.SystemRandom()
-        exp = rn.randrange(1, size_of_int_m)
+    exp = 2
+    #if size_of_int_m > 2:
+     #   rn = secrets.SystemRandom()
+      #  exp = rn.randrange(1, size_of_int_m)
     m2 = m % (10 ** exp)
     m1 = m - m2
     return {'part_1': m1, 'part_2': m2}

@@ -8,15 +8,16 @@ from numpy import array
 
 import helper_method_enc
 
+
 def read_image(path, block_size):
     fin = Image.open(path)
     print(fin.size)
     image = array(fin)
-    width = bin(fin.size[0])[2:]
-    div_width = block_size - len(width)
-    if (div_width > 0):
-        width = '0' * div_width + width
-    image_bits = width
+    # width = bin(fin.size[0])[2:]
+    # div_width = block_size - len(width)
+    # if (div_width > 0):
+    #   width = '0' * div_width + width
+    image_bits = ''  # width
     for row in range(fin.size[1]):
         for i_pixel in range(fin.size[0]):
             pixel = image[row][i_pixel]
@@ -29,15 +30,14 @@ def read_image(path, block_size):
                 pix_s += rgb_s
             image_bits += pix_s
     print(len(image_bits))
-    return image_bits
+    return image_bits, fin.size[0]
 
 
-def write_image(array_image, block_size):
+def write_image(array_image, width):
+    # width_str = array_image[:block_size]
+    # array_image = array_image[block_size:]
 
-    width_str = array_image[:block_size]
-    array_image = array_image[block_size:]
-
-    width = int(width_str, 2)
+    # width = int(width_str, 2)
     image = []
 
     row_num = int(len(array_image) / (width * 24))
@@ -86,6 +86,7 @@ def block_to_binary(blocks: [], block_size):
         blocks_St += block_bin
     print(len(blocks_St))
     return blocks_St
+
 
 def to_binary(blocks: []):
     blocks_St = ''
