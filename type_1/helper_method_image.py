@@ -17,27 +17,21 @@ def read_image(path, block_size):
     # div_width = block_size - len(width)
     # if (div_width > 0):
     #   width = '0' * div_width + width
-    image_bits = ''  # width
+    image_bits = []
     for row in range(fin.size[1]):
         for i_pixel in range(fin.size[0]):
             pixel = image[row][i_pixel]
-            pix_s = ''
             for i_rgb in range(3):
                 rgb_s = bin(pixel[i_rgb])[2:]
                 if (len(rgb_s) < 8):
-                    zeroo_number = 8 - len(rgb_s)
-                    rgb_s = '0' * zeroo_number + rgb_s
-                pix_s += rgb_s
-            image_bits += pix_s
-    print(len(image_bits))
-    return image_bits, fin.size[0]
+                    zero_number = 8 - len(rgb_s)
+                    rgb_s = '0' * zero_number + rgb_s
+                image_bits.append( rgb_s)
+    return ''.join([rgb for rgb in image_bits]), fin.size[0]
 
 
 def write_image(array_image, width):
-    # width_str = array_image[:block_size]
-    # array_image = array_image[block_size:]
 
-    # width = int(width_str, 2)
     image = []
 
     row_num = int(len(array_image) / (width * 24))
@@ -78,19 +72,15 @@ def block_to_decimal(block_decimal: [], len_m1, size):
 
 
 def block_to_binary(blocks: [], block_size):
-    blocks_St = ''
-    for block in blocks:
-        block_bin = bin(block)[2:]
-        if len(block_bin) < block_size:
-            block_bin = '0' * (block_size - len(block_bin)) + block_bin
-        blocks_St += block_bin
-    print(len(blocks_St))
-    return blocks_St
+    return ''.join([block_to_bin(block, block_size) for block in blocks])
+
+
+def block_to_bin(block, block_size):
+    block_bin = bin(block)[2:]
+    if len(block_bin) < block_size:
+        block_bin = '0' * (block_size - len(block_bin)) + block_bin
+    return block_bin
 
 
 def to_binary(blocks: []):
-    blocks_St = ''
-    for block in blocks:
-        block_bin = bin(block)[2:]
-        blocks_St += block_bin
-    return blocks_St
+    return ''.join([bin(block)[2:] for block in blocks])
